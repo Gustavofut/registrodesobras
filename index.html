@@ -181,7 +181,6 @@ Registros: <span id="contador">0</span>
 
 <h1>REGISTRO DE SOBRAS</h1>
 
-<!-- LOGIN -->
 <div id="loginArea">
 
 <div class="login-box">
@@ -196,14 +195,6 @@ Registros: <span id="contador">0</span>
 <option>Ana</option>
 </select>
 
-<div class="row">
-
-<div>
-<label>PIN</label>
-<input type="password" id="pin">
-</div>
-
-<div>
 <label>MESA</label>
 
 <select id="mesa">
@@ -214,17 +205,12 @@ Registros: <span id="contador">0</span>
 <option>Mesa 04</option>
 </select>
 
-</div>
-
-</div>
-
 <button onclick="fazerLogin()">ENTRAR</button>
 
 </div>
 
 </div>
 
-<!-- SISTEMA -->
 <div id="sistema" class="hidden">
 
 <div class="userLogged" id="usuarioLogado"></div>
@@ -281,10 +267,10 @@ autofocus
 
 </div>
 
-<label>NÚMERO REVERSO</label>
+<label id="labelStatusNumero">NÚMERO REVERSO</label>
 
 <input
-type="number"
+type="text"
 id="statusNumero"
 placeholder="EX: 12"
 >
@@ -301,12 +287,14 @@ placeholder="EX: 12"
 
 </div>
 
+<button onclick="sair()" style="background:#ef4444; margin-top:20px; font-size: 16px;">SAIR (LIMPAR LOGIN)</button>
+
 </div>
 
 </div>
 
 <div class="footer">
-© 2025 Controle operacional de sobras
+© 2026 Controle operacional de sobras
 </div>
 
 </div>
@@ -321,35 +309,72 @@ let contador = 0;
 
 const ultimosRegistros = {};
 
+// Função para checar se já tem alguém logado ao carregar a página
+document.addEventListener("DOMContentLoaded", function() {
+    checkLoginStatus();
+
+    // Listener para mudar o campo NÚMERO REVERSO para texto/cor se for COLMEIA
+    document.getElementById("statusTipo").addEventListener("change", function() {
+        const label = document.getElementById("labelStatusNumero");
+        const input = document.getElementById("statusNumero");
+        
+        if(this.value === "COLMEIA") {
+            label.innerText = "COR DA COLMEIA";
+            input.placeholder = "EX: AZUL";
+        } else {
+            label.innerText = "NÚMERO REVERSO";
+            input.placeholder = "EX: 12";
+        }
+    });
+});
+
+function checkLoginStatus() {
+    const savedConferente = localStorage.getItem("conferenteLogado");
+    const savedMesa = localStorage.getItem("mesaLogada");
+
+    if (savedConferente && savedMesa) {
+        usuarioAtual = savedConferente;
+        mesaAtual = savedMesa;
+        iniciarSistema();
+    }
+}
+
 function fazerLogin(){
 
     const conferente = document.getElementById("conferente").value;
-
-    const pin = document.getElementById("pin").value;
-
     const mesa = document.getElementById("mesa").value;
 
-    if(!conferente || !pin || !mesa){
-
+    if(!conferente || !mesa){
         alert("Preencha todos os campos");
         return;
-
     }
 
     usuarioAtual = conferente;
     mesaAtual = mesa;
 
-    document.getElementById("loginArea").classList.add("hidden");
+    // Salva os dados no navegador
+    localStorage.setItem("conferenteLogado", usuarioAtual);
+    localStorage.setItem("mesaLogada", mesaAtual);
 
+    iniciarSistema();
+}
+
+function iniciarSistema() {
+    document.getElementById("loginArea").classList.add("hidden");
     document.getElementById("sistema").classList.remove("hidden");
 
     document.getElementById("usuarioLogado").innerHTML =
     `${usuarioAtual} | ${mesaAtual}`;
 
     atualizarHorario();
-
     setInterval(atualizarHorario,1000);
+}
 
+// Opcional: botão para sair da conta e liberar para outro conferente
+function sair() {
+    localStorage.removeItem("conferenteLogado");
+    localStorage.removeItem("mesaLogada");
+    window.location.reload();
 }
 
 function atualizarHorario(){
@@ -372,7 +397,7 @@ async function registrar(){
 
     const statusTipo = document.getElementById("statusTipo").value;
 
-    const statusNumero = document.getElementById("statusNumero").value;
+    const statusNumero = document.getElementById("statusNumero").value.trim();
 
     const mensagem = document.getElementById("mensagem");
 
@@ -468,6 +493,10 @@ async function registrar(){
         document.getElementById("statusTipo").value = "";
 
         document.getElementById("statusNumero").value = "";
+
+        // Retorna a label para o formato padrão ao limpar a tela
+        document.getElementById("labelStatusNumero").innerText = "NÚMERO REVERSO";
+        document.getElementById("statusNumero").placeholder = "EX: 12";
 
         document.getElementById("codigo").focus();
 
