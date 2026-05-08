@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Registro de Sobras</title>
+
+<style>
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:Arial, sans-serif;
+}
+
+body{
+    background:#e5e7eb;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    min-height:100vh;
+    padding:20px;
+    color:#1f2937;
+}
+
+.container{
+    width:100%;
+    max-width:540px;
+}
+
+.card{
+    background:#f8f8f8;
+    border-radius:22px;
+    padding:32px;
+    box-shadow:0 10px 25px rgba(0,0,0,0.12);
+    position:relative;
+}
+
+.top-badge{
+    position:absolute;
+    top:18px;
+    right:18px;
+    background:#4f46e5;
+    color:white;
+    padding:10px 16px;
+    border-radius:14px;
+    font-size:14px;
+    font-weight:bold;
+}
+
+h1{
+    text-align:center;
+    margin-bottom:28px;
+    font-size:22px;
+    font-weight:800;
+    color:#1f2937;
+}
+
+.login-box{
+    margin-bottom:25px;
+    padding:18px;
+    background:#eceff1;
+    border:1px solid #d1d5db;
+    border-radius:12px;
+}
+
+label{
+    display:block;
+    margin-bottom:8px;
+    font-weight:700;
+    font-size:14px;
+    color:#374151;
+}
+
+input,
+select{
+    width:100%;
+    height:44px;
+    border:1px solid #c7c7c7;
+    border-radius:8px;
+    padding:0 14px;
+    font-size:15px;
+    margin-bottom:18px;
+    background:white;
+}
+
+input:focus,
+select:focus{
+    outline:none;
+    border-color:#2563eb;
+}
+
+.row{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:14px;
+}
+
+button{
+    width:100%;
+    height:50px;
+    border:none;
+    border-radius:10px;
+    background:#1877f2;
+    color:white;
+    font-size:20px;
+    font-weight:800;
+    cursor:pointer;
+    transition:0.2s;
+    margin-top:10px;
+}
+
+button:hover{
+    background:#1664cf;
+}
+
+.status{
+    margin-top:18px;
+    text-align:center;
+    font-weight:bold;
+}
+
+.history{
+    margin-top:28px;
+    background:#eceff1;
+    border-radius:12px;
+    padding:18px;
+}
+
+.history h3{
+    margin-bottom:12px;
+}
+
+.history ul{
+    list-style:none;
+    max-height:200px;
+    overflow:auto;
+}
+
+.history li{
+    padding:10px 0;
+    border-bottom:1px solid #d1d5db;
+    font-size:14px;
+}
+
+.footer{
+    text-align:center;
+    margin-top:18px;
+    font-size:13px;
+    color:#6b7280;
+}
+
+.hidden{
+    display:none;
+}
+
+.userLogged{
+    background:#dbeafe;
+    color:#1d4ed8;
+    padding:10px;
+    border-radius:10px;
+    text-align:center;
+    font-weight:bold;
+    margin-bottom:20px;
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<div class="card">
+
+<div class="top-badge">
+Registros: <span id="contador">0</span>
+</div>
+
+<h1>REGISTRO DE SOBRAS</h1>
+
+<!-- LOGIN -->
+<div id="loginArea">
+
+<div class="login-box">
+
+<label>CONFERENTE</label>
+
+<select id="conferente">
+<option value="">SELECIONE...</option>
+<option>Gustavo</option>
+<option>Maria</option>
+<option>João</option>
+<option>Ana</option>
+</select>
+
+<div class="row">
+
+<div>
+<label>PIN</label>
+<input type="password" id="pin">
+</div>
+
+<div>
+<label>MESA</label>
+
+<select id="mesa">
+<option value="">SELECIONE...</option>
+<option>Mesa 01</option>
+<option>Mesa 02</option>
+<option>Mesa 03</option>
+<option>Mesa 04</option>
+</select>
+
+</div>
+
+</div>
+
+<button onclick="fazerLogin()">ENTRAR</button>
+
+</div>
+
+</div>
+
+<!-- SISTEMA -->
+<div id="sistema" class="hidden">
+
+<div class="userLogged" id="usuarioLogado"></div>
+
+<div class="row">
+
+<div>
+<label>DATA</label>
+<input type="text" id="dataAtual" readonly>
+</div>
+
+<div>
+<label>HORÁRIO</label>
+<input type="text" id="horaAtual" readonly>
+</div>
+
+</div>
+
+<label>COD+VARIAÇÃO</label>
+
+<input
+type="text"
+id="codigo"
+placeholder="BIPE O PRODUTO..."
+autofocus
+>
+
+<div class="row">
+
+<div>
+<label>CATEGORIA</label>
+
+<select id="categoria">
+<option value="">SELECIONE...</option>
+<option>Calçado</option>
+<option>Vestuário</option>
+<option>Acessório</option>
+<option>Suplemento</option>
+</select>
+
+</div>
+
+<div>
+<label>REVERSO</label>
+
+<select id="statusTipo">
+<option value="">SELECIONE...</option>
+<option>CHECKOUT</option>
+<option>COLMEIA</option>
+<option>SACA</option>
+</select>
+
+</div>
+
+</div>
+
+<label>NÚMERO REVERSO</label>
+
+<input
+type="number"
+id="statusNumero"
+placeholder="EX: 12"
+>
+
+<button onclick="registrar()">FINALIZAR REGISTRO</button>
+
+<div class="status" id="mensagem"></div>
+
+<div class="history">
+
+<h3>ÚLTIMOS REGISTROS</h3>
+
+<ul id="historico"></ul>
+
+</div>
+
+</div>
+
+</div>
+
+<div class="footer">
+© 2025 Controle operacional de sobras
+</div>
+
+</div>
+
+<script>
+
+const WEBHOOK_URL = "https://script.google.com/macros/s/AKfycbwz4EuviMxr3FnnoqzJYqUcVS07MNdr2BVS3Vzi3PRpTXq1MUqim3IjVTH2zeAeHj2W/exec";
+
+let usuarioAtual = "";
+let mesaAtual = "";
+let contador = 0;
+
+const ultimosRegistros = {};
+
+function fazerLogin(){
+
+    const conferente = document.getElementById("conferente").value;
+
+    const pin = document.getElementById("pin").value;
+
+    const mesa = document.getElementById("mesa").value;
+
+    if(!conferente || !pin || !mesa){
+
+        alert("Preencha todos os campos");
+        return;
+
+    }
+
+    usuarioAtual = conferente;
+    mesaAtual = mesa;
+
+    document.getElementById("loginArea").classList.add("hidden");
+
+    document.getElementById("sistema").classList.remove("hidden");
+
+    document.getElementById("usuarioLogado").innerHTML =
+    `${usuarioAtual} | ${mesaAtual}`;
+
+    atualizarHorario();
+
+    setInterval(atualizarHorario,1000);
+
+}
+
+function atualizarHorario(){
+
+    const agora = new Date();
+
+    document.getElementById("dataAtual").value =
+    agora.toLocaleDateString("pt-BR");
+
+    document.getElementById("horaAtual").value =
+    agora.toLocaleTimeString("pt-BR");
+
+}
+
+async function registrar(){
+
+    const codigo = document.getElementById("codigo").value.trim();
+
+    const categoria = document.getElementById("categoria").value;
+
+    const statusTipo = document.getElementById("statusTipo").value;
+
+    const statusNumero = document.getElementById("statusNumero").value;
+
+    const mensagem = document.getElementById("mensagem");
+
+    const regex = /^\d{6}\+\d{3}$/;
+
+    if(!regex.test(codigo)){
+
+        mensagem.innerHTML = "Formato inválido. Ex: 123456+001";
+
+        mensagem.style.color = "red";
+
+        return;
+
+    }
+
+    if(!categoria || !statusTipo || !statusNumero){
+
+        mensagem.innerHTML = "Preencha todos os campos";
+
+        mensagem.style.color = "red";
+
+        return;
+
+    }
+
+    const agora = Date.now();
+
+    if(
+        ultimosRegistros[codigo] &&
+        agora - ultimosRegistros[codigo] < 300000
+    ){
+
+        mensagem.innerHTML = "Registro duplicado recente";
+
+        mensagem.style.color = "#d97706";
+
+        return;
+
+    }
+
+    ultimosRegistros[codigo] = agora;
+
+    const split = codigo.split("+");
+
+    const payload = {
+
+        data: new Date().toLocaleDateString("pt-BR"),
+
+        hora: new Date().toLocaleTimeString("pt-BR"),
+
+        timestamp: agora,
+
+        conferente: usuarioAtual,
+
+        mesa: mesaAtual,
+
+        codigoCompleto: codigo,
+
+        pedido: split[0],
+
+        variacao: split[1],
+
+        categoria: categoria,
+
+        status: `${statusTipo} ${statusNumero}`
+
+    };
+
+    try{
+
+        await fetch(WEBHOOK_URL,{
+
+            method:"POST",
+
+            body:JSON.stringify(payload)
+
+        });
+
+        contador++;
+
+        document.getElementById("contador").innerHTML = contador;
+
+        adicionarHistorico(payload);
+
+        mensagem.innerHTML = "Registro enviado com sucesso";
+
+        mensagem.style.color = "green";
+
+        document.getElementById("codigo").value = "";
+
+        document.getElementById("categoria").value = "";
+
+        document.getElementById("statusTipo").value = "";
+
+        document.getElementById("statusNumero").value = "";
+
+        document.getElementById("codigo").focus();
+
+    }catch(error){
+
+        mensagem.innerHTML = "Erro ao enviar";
+
+        mensagem.style.color = "red";
+
+    }
+
+}
+
+function adicionarHistorico(payload){
+
+    const li = document.createElement("li");
+
+    li.innerHTML = `
+    ${payload.hora} |
+    ${payload.mesa} |
+    ${payload.conferente} |
+    ${payload.codigoCompleto} |
+    ${payload.status}
+    `;
+
+    document.getElementById("historico").prepend(li);
+
+}
+
+</script>
+
+</body>
+</html>
