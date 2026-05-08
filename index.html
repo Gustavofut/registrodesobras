@@ -116,6 +116,11 @@ button:hover{
     background:#1664cf;
 }
 
+button:disabled {
+    background: #9ca3af;
+    cursor: not-allowed;
+}
+
 .status{
     margin-top:18px;
     text-align:center;
@@ -164,6 +169,15 @@ button:hover{
     text-align:center;
     font-weight:bold;
     margin-bottom:20px;
+}
+
+.offline-badge {
+    background: #f59e0b;
+    color: white;
+    font-size: 10px;
+    padding: 2px 5px;
+    border-radius: 4px;
+    margin-left: 5px;
 }
 
 </style>
@@ -275,7 +289,7 @@ id="statusNumero"
 placeholder="EX: 12"
 >
 
-<button onclick="registrar()">FINALIZAR REGISTRO</button>
+<button id="btnRegistrar" onclick="registrar()">FINALIZAR REGISTRO</button>
 
 <div class="status" id="mensagem"></div>
 
@@ -306,14 +320,31 @@ const WEBHOOK_URL = "https://script.google.com/macros/s/AKfycbz4dk_avPRWpSmTqbof
 let usuarioAtual = "";
 let mesaAtual = "";
 let contador = 0;
+let processando = false;
 
-const ultimosRegistros = {};
+const ultimosRegistrosTimestamps = {};
 
-// Função para checar se já tem alguém logado ao carregar a página
 document.addEventListener("DOMContentLoaded", function() {
     checkLoginStatus();
+    carregarHistoricoLocal();
+    verificarFilaPendente();
 
-    // Listener para mudar o campo NÚMERO REVERSO para texto/cor se for COLMEIA
+    // Listener para o campo Código (Suporte a Leitor)
+    document.getElementById("codigo").addEventListener("keypress", function(e) {
+        if (e.key === "Enter") {
+            const cat = document.getElementById("categoria").value;
+            const tipo = document.getElementById("statusTipo").value;
+            const num = document.getElementById("statusNumero").value;
+            
+            // Se já tiver categoria e reverso preenchidos, registra direto
+            if(cat && tipo && num) {
+                registrar();
+            } else {
+                document.getElementById("categoria").focus();
+            }
+        }
+    });
+
     document.getElementById("statusTipo").addEventListener("change", function() {
         const label = document.getElementById("labelStatusNumero");
         const input = document.getElementById("statusNumero");
@@ -340,7 +371,6 @@ function checkLoginStatus() {
 }
 
 function fazerLogin(){
-
     const conferente = document.getElementById("conferente").value;
     const mesa = document.getElementById("mesa").value;
 
@@ -351,179 +381,162 @@ function fazerLogin(){
 
     usuarioAtual = conferente;
     mesaAtual = mesa;
-
-    // Salva os dados no navegador
     localStorage.setItem("conferenteLogado", usuarioAtual);
     localStorage.setItem("mesaLogada", mesaAtual);
-
     iniciarSistema();
 }
 
 function iniciarSistema() {
     document.getElementById("loginArea").classList.add("hidden");
     document.getElementById("sistema").classList.remove("hidden");
-
-    document.getElementById("usuarioLogado").innerHTML =
-    `${usuarioAtual} | ${mesaAtual}`;
-
+    document.getElementById("usuarioLogado").innerHTML = `${usuarioAtual} | ${mesaAtual}`;
     atualizarHorario();
     setInterval(atualizarHorario,1000);
 }
 
-// Opcional: botão para sair da conta e liberar para outro conferente
 function sair() {
-    localStorage.removeItem("conferenteLogado");
-    localStorage.removeItem("mesaLogada");
-    window.location.reload();
+    if(confirm("Deseja realmente sair?")){
+        localStorage.removeItem("conferenteLogado");
+        localStorage.removeItem("mesaLogada");
+        localStorage.removeItem("historicoLocal");
+        window.location.reload();
+    }
 }
 
 function atualizarHorario(){
-
     const agora = new Date();
-
-    document.getElementById("dataAtual").value =
-    agora.toLocaleDateString("pt-BR");
-
-    document.getElementById("horaAtual").value =
-    agora.toLocaleTimeString("pt-BR");
-
+    document.getElementById("dataAtual").value = agora.toLocaleDateString("pt-BR");
+    document.getElementById("horaAtual").value = agora.toLocaleTimeString("pt-BR");
 }
 
 async function registrar(){
+    if(processando) return;
 
     const codigo = document.getElementById("codigo").value.trim();
-
     const categoria = document.getElementById("categoria").value;
-
     const statusTipo = document.getElementById("statusTipo").value;
-
     const statusNumero = document.getElementById("statusNumero").value.trim();
-
     const mensagem = document.getElementById("mensagem");
+    const btn = document.getElementById("btnRegistrar");
 
     const regex = /^\d{6}\+\d{3}$/;
 
     if(!regex.test(codigo)){
-
         mensagem.innerHTML = "Formato inválido. Ex: 123456+001";
-
         mensagem.style.color = "red";
-
         return;
-
     }
 
     if(!categoria || !statusTipo || !statusNumero){
-
         mensagem.innerHTML = "Preencha todos os campos";
-
         mensagem.style.color = "red";
-
         return;
-
     }
 
     const agora = Date.now();
-
-    if(
-        ultimosRegistros[codigo] &&
-        agora - ultimosRegistros[codigo] < 300000
-    ){
-
-        mensagem.innerHTML = "Registro duplicado recente";
-
-        mensagem.style.color = "#d97706";
-
-        return;
-
+    if(ultimosRegistrosTimestamps[codigo] && agora - ultimosRegistrosTimestamps[codigo] < 300000){
+        if(!confirm("Este item foi registrado há menos de 5 min. Duplicar registro?")) return;
     }
 
-    ultimosRegistros[codigo] = agora;
-
-    const split = codigo.split("+");
+    processando = true;
+    btn.disabled = true;
+    btn.innerText = "ENVIANDO...";
+    mensagem.innerHTML = "Processando...";
+    mensagem.style.color = "gray";
 
     const payload = {
-
+        id: agora + Math.random(), // ID único para controle de fila
         data: new Date().toLocaleDateString("pt-BR"),
-
         hora: new Date().toLocaleTimeString("pt-BR"),
-
         timestamp: agora,
-
         conferente: usuarioAtual,
-
         mesa: mesaAtual,
-
         codigoCompleto: codigo,
-
-        pedido: split[0],
-
-        variacao: split[1],
-
+        pedido: codigo.split("+")[0],
+        variacao: codigo.split("+")[1],
         categoria: categoria,
-
         status: `${statusTipo} ${statusNumero}`
-
     };
 
-    try{
+    ultimosRegistrosTimestamps[codigo] = agora;
 
-        await fetch(WEBHOOK_URL,{
-
-            method:"POST",
-
-            body:JSON.stringify(payload)
-
-        });
-
-        contador++;
-
-        document.getElementById("contador").innerHTML = contador;
-
-        adicionarHistorico(payload);
-
+    try {
+        await enviarParaWebhook(payload);
         mensagem.innerHTML = "Registro enviado com sucesso";
-
         mensagem.style.color = "green";
-
-        document.getElementById("codigo").value = "";
-
-        document.getElementById("categoria").value = "";
-
-        document.getElementById("statusTipo").value = "";
-
-        document.getElementById("statusNumero").value = "";
-
-        // Retorna a label para o formato padrão ao limpar a tela
-        document.getElementById("labelStatusNumero").innerText = "NÚMERO REVERSO";
-        document.getElementById("statusNumero").placeholder = "EX: 12";
-
-        document.getElementById("codigo").focus();
-
-    }catch(error){
-
-        mensagem.innerHTML = "Erro ao enviar";
-
-        mensagem.style.color = "red";
-
+    } catch (error) {
+        salvarNaFila(payload);
+        mensagem.innerHTML = "Sem conexão. Salvo para envio automático!";
+        mensagem.style.color = "#d97706";
     }
 
+    adicionarHistorico(payload);
+    limparCampos();
+    processando = false;
+    btn.disabled = false;
+    btn.innerText = "FINALIZAR REGISTRO";
 }
 
-function adicionarHistorico(payload){
+async function enviarParaWebhook(payload) {
+    return fetch(WEBHOOK_URL, {
+        method: "POST",
+        body: JSON.stringify(payload)
+    });
+}
 
+function limparCampos() {
+    document.getElementById("codigo").value = "";
+    document.getElementById("codigo").focus();
+}
+
+function adicionarHistorico(payload, isOffline = false){
+    contador++;
+    document.getElementById("contador").innerHTML = contador;
+
+    const hist = JSON.parse(localStorage.getItem("historicoLocal") || "[]");
+    hist.unshift(payload);
+    if(hist.length > 20) hist.pop();
+    localStorage.setItem("historicoLocal", JSON.stringify(hist));
+
+    renderizarLinhaHistorico(payload);
+}
+
+function renderizarLinhaHistorico(payload) {
     const li = document.createElement("li");
-
-    li.innerHTML = `
-    ${payload.hora} |
-    ${payload.mesa} |
-    ${payload.conferente} |
-    ${payload.codigoCompleto} |
-    ${payload.status}
-    `;
-
+    li.innerHTML = `${payload.hora} | ${payload.mesa} | ${payload.codigoCompleto} | ${payload.status}`;
     document.getElementById("historico").prepend(li);
+}
 
+function carregarHistoricoLocal() {
+    const hist = JSON.parse(localStorage.getItem("historicoLocal") || "[]");
+    hist.reverse().forEach(item => {
+        renderizarLinhaHistorico(item);
+        contador++;
+    });
+    document.getElementById("contador").innerHTML = contador;
+}
+
+function salvarNaFila(payload) {
+    const fila = JSON.parse(localStorage.getItem("filaPendente") || "[]");
+    fila.push(payload);
+    localStorage.setItem("filaPendente", JSON.stringify(fila));
+}
+
+async function verificarFilaPendente() {
+    setInterval(async () => {
+        if(navigator.onLine) {
+            const fila = JSON.parse(localStorage.getItem("filaPendente") || "[]");
+            if(fila.length > 0) {
+                const item = fila[0];
+                try {
+                    await enviarParaWebhook(item);
+                    fila.shift();
+                    localStorage.setItem("filaPendente", JSON.stringify(fila));
+                    console.log("Item pendente enviado!");
+                } catch(e) {}
+            }
+        }
+    }, 10000);
 }
 
 </script>
