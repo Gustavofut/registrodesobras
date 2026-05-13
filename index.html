@@ -74,8 +74,7 @@ label{
     color:#374151;
 }
 
-input,
-select{
+input, select{
     width:100%;
     height:44px;
     border:1px solid #c7c7c7;
@@ -86,8 +85,7 @@ select{
     background:white;
 }
 
-input:focus,
-select:focus{
+input:focus, select:focus{
     outline:none;
     border-color:#2563eb;
 }
@@ -95,6 +93,12 @@ select:focus{
 .row{
     display:grid;
     grid-template-columns:1fr 1fr;
+    gap:14px;
+}
+
+.row-codigo{
+    display:grid;
+    grid-template-columns: 2fr 1fr; /* O código fica maior que a quantidade */
     gap:14px;
 }
 
@@ -171,13 +175,49 @@ button:disabled {
     margin-bottom:20px;
 }
 
-.offline-badge {
-    background: #f59e0b;
-    color: white;
-    font-size: 10px;
-    padding: 2px 5px;
-    border-radius: 4px;
-    margin-left: 5px;
+/* Estilos da Colmeia */
+.cores-container {
+    background: white;
+    padding: 15px;
+    border-radius: 8px;
+    border: 1px solid #c7c7c7;
+    margin-bottom: 18px;
+}
+
+.cores-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    justify-items: center;
+}
+
+.cor-circle {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    cursor: pointer;
+    border: 2px solid #d1d5db;
+    transition: all 0.2s ease-in-out;
+}
+
+.cor-circle:hover {
+    transform: scale(1.1);
+}
+
+.cor-circle.selected {
+    outline: 4px solid #2563eb;
+    outline-offset: 3px;
+    transform: scale(1.1);
+    border-color: transparent;
+}
+
+.cor-label {
+    text-align: center;
+    font-size: 16px;
+    font-weight: bold;
+    color: #4f46e5;
+    margin-top: 12px;
+    min-height: 20px;
 }
 
 </style>
@@ -217,6 +257,13 @@ Registros: <span id="contador">0</span>
 <option>Mesa 02</option>
 <option>Mesa 03</option>
 <option>Mesa 04</option>
+<option>Mesa 05</option>
+<option>Mesa 06</option>
+<option>Mesa 07</option>
+<option>Mesa 08</option>
+<option>Mesa 09 FULL</option>
+<option>Mesa 10 FULL</option>
+<option>Mesa 11 FULL</option>
 </select>
 
 <button onclick="fazerLogin()">ENTRAR</button>
@@ -243,14 +290,16 @@ Registros: <span id="contador">0</span>
 
 </div>
 
-<label>COD+VARIAÇÃO</label>
-
-<input
-type="text"
-id="codigo"
-placeholder="BIPE O PRODUTO..."
-autofocus
->
+<div class="row-codigo">
+    <div>
+        <label>COD+VARIAÇÃO</label>
+        <input type="text" id="codigo" placeholder="BIPE O PRODUTO..." autofocus>
+    </div>
+    <div>
+        <label>QUANTIDADE</label>
+        <input type="number" id="quantidade" value="1" min="1">
+    </div>
+</div>
 
 <div class="row">
 
@@ -268,26 +317,44 @@ autofocus
 </div>
 
 <div>
-<label>REVERSO</label>
+<label>CLASSIFICAÇÃO DO PEDIDO</label>
 
 <select id="statusTipo">
 <option value="">SELECIONE...</option>
-<option>CHECKOUT</option>
+<option>EXPRESS</option>
 <option>COLMEIA</option>
-<option>SACA</option>
 </select>
 
 </div>
 
 </div>
 
-<label id="labelStatusNumero">NÚMERO REVERSO</label>
+<div id="areaExpress" class="hidden">
+    <label>NÚMERO DA CAIXA</label>
+    <input type="text" id="caixaExpress" placeholder="BIPE A CAIXA...">
+</div>
 
-<input
-type="text"
-id="statusNumero"
-placeholder="EX: 12"
->
+<div id="areaColmeia" class="hidden cores-container">
+    <label style="text-align: center; margin-bottom: 12px;">COR DA COLMEIA</label>
+    
+    <div class="cores-grid">
+        <div class="cor-circle" style="background:#facc15;" data-cor="AMARELA"></div>
+        <div class="cor-circle" style="background:#3b82f6;" data-cor="AZUL"></div>
+        <div class="cor-circle" style="background:#ffffff;" data-cor="BRANCA"></div>
+        <div class="cor-circle" style="background:#9ca3af;" data-cor="CINZA"></div>
+        <div class="cor-circle" style="background:#f97316;" data-cor="LARANJA"></div>
+        <div class="cor-circle" style="background:#78350f;" data-cor="MARROM"></div>
+        <div class="cor-circle" style="background:#65a30d;" data-cor="OLIVA"></div>
+        <div class="cor-circle" style="background:#111827;" data-cor="PRETA"></div>
+        <div class="cor-circle" style="background:#ec4899;" data-cor="ROSA"></div>
+        <div class="cor-circle" style="background:#a855f7;" data-cor="ROXA"></div>
+        <div class="cor-circle" style="background:#22c55e;" data-cor="VERDE"></div>
+        <div class="cor-circle" style="background:#ef4444;" data-cor="VERMELHA"></div>
+    </div>
+    
+    <input type="hidden" id="corSelecionada">
+    <div class="cor-label" id="textoCorSelecionada">Selecione uma cor</div>
+</div>
 
 <button id="btnRegistrar" onclick="registrar()">FINALIZAR REGISTRO</button>
 
@@ -329,33 +396,58 @@ document.addEventListener("DOMContentLoaded", function() {
     carregarHistoricoLocal();
     verificarFilaPendente();
 
-    // Listener para o campo Código (Suporte a Leitor)
+    // Suporte a Leitor (Enter no Código)
     document.getElementById("codigo").addEventListener("keypress", function(e) {
         if (e.key === "Enter") {
             const cat = document.getElementById("categoria").value;
             const tipo = document.getElementById("statusTipo").value;
-            const num = document.getElementById("statusNumero").value;
             
-            // Se já tiver categoria e reverso preenchidos, registra direto
-            if(cat && tipo && num) {
-                registrar();
+            // Se as opções já estiverem selecionadas, tenta registrar. Se não, pula para quantidade.
+            if(cat && tipo) {
+                document.getElementById("quantidade").focus();
             } else {
-                document.getElementById("categoria").focus();
+                document.getElementById("quantidade").focus();
             }
         }
     });
 
+    // Dinâmica de exibir Express x Colmeia
     document.getElementById("statusTipo").addEventListener("change", function() {
-        const label = document.getElementById("labelStatusNumero");
-        const input = document.getElementById("statusNumero");
+        const areaExpress = document.getElementById("areaExpress");
+        const areaColmeia = document.getElementById("areaColmeia");
         
-        if(this.value === "COLMEIA") {
-            label.innerText = "COR DA COLMEIA";
-            input.placeholder = "EX: AZUL";
+        // Limpa os dados ao trocar
+        document.getElementById("caixaExpress").value = "";
+        document.getElementById("corSelecionada").value = "";
+        document.getElementById("textoCorSelecionada").innerText = "Selecione uma cor";
+        document.querySelectorAll('.cor-circle').forEach(c => c.classList.remove('selected'));
+
+        if(this.value === "EXPRESS") {
+            areaExpress.classList.remove("hidden");
+            areaColmeia.classList.add("hidden");
+            document.getElementById("caixaExpress").focus();
+        } else if (this.value === "COLMEIA") {
+            areaColmeia.classList.remove("hidden");
+            areaExpress.classList.add("hidden");
         } else {
-            label.innerText = "NÚMERO REVERSO";
-            input.placeholder = "EX: 12";
+            areaExpress.classList.add("hidden");
+            areaColmeia.classList.add("hidden");
         }
+    });
+
+    // Dinâmica das bolinhas de cores
+    document.querySelectorAll('.cor-circle').forEach(circle => {
+        circle.addEventListener('click', function() {
+            // Remove a classe de todas e adiciona na selecionada
+            document.querySelectorAll('.cor-circle').forEach(c => c.classList.remove('selected'));
+            this.classList.add('selected');
+            
+            // Pega o valor e atualiza na tela
+            const cor = this.getAttribute('data-cor');
+            document.getElementById('corSelecionada').value = cor;
+            document.getElementById('textoCorSelecionada').innerText = `COR: ${cor}`;
+            document.getElementById('textoCorSelecionada').style.color = this.style.background === 'rgb(255, 255, 255)' ? '#000' : this.style.background;
+        });
     });
 });
 
@@ -413,22 +505,30 @@ async function registrar(){
     if(processando) return;
 
     const codigo = document.getElementById("codigo").value.trim();
+    const quantidade = document.getElementById("quantidade").value;
     const categoria = document.getElementById("categoria").value;
-    const statusTipo = document.getElementById("statusTipo").value;
-    const statusNumero = document.getElementById("statusNumero").value.trim();
+    const statusTipo = document.getElementById("statusTipo").value; // EXPRESS ou COLMEIA
+    
+    let classificacaoValor = "";
+    if (statusTipo === "EXPRESS") {
+        classificacaoValor = document.getElementById("caixaExpress").value.trim();
+    } else if (statusTipo === "COLMEIA") {
+        classificacaoValor = document.getElementById("corSelecionada").value;
+    }
+
     const mensagem = document.getElementById("mensagem");
     const btn = document.getElementById("btnRegistrar");
 
+    // Validação do Formato Bipado
     const regex = /^\d{6}\+\d{3}$/;
-
     if(!regex.test(codigo)){
         mensagem.innerHTML = "Formato inválido. Ex: 123456+001";
         mensagem.style.color = "red";
         return;
     }
 
-    if(!categoria || !statusTipo || !statusNumero){
-        mensagem.innerHTML = "Preencha todos os campos";
+    if(!categoria || !statusTipo || !classificacaoValor || !quantidade){
+        mensagem.innerHTML = "Preencha todos os campos e selecione a caixa/cor";
         mensagem.style.color = "red";
         return;
     }
@@ -444,18 +544,21 @@ async function registrar(){
     mensagem.innerHTML = "Processando...";
     mensagem.style.color = "gray";
 
+    /* Mapeamento Ajustado:
+       O Timestamp foi removido.
+       O antigo 'pedido' agora manda a Quantidade (Coluna F).
+       A antiga 'variacao' agora manda a Cor ou Caixa (Coluna G).
+    */
     const payload = {
-        id: agora + Math.random(), // ID único para controle de fila
         data: new Date().toLocaleDateString("pt-BR"),
         hora: new Date().toLocaleTimeString("pt-BR"),
-        timestamp: agora,
         conferente: usuarioAtual,
         mesa: mesaAtual,
         codigoCompleto: codigo,
-        pedido: codigo.split("+")[0],
-        variacao: codigo.split("+")[1],
+        pedido: quantidade,  // Quantidade vai para a antiga coluna G ("PEDIDO") -> Renomear no sheet
+        variacao: classificacaoValor, // Cor ou Caixa vai para antiga coluna H ("VARIACAO") -> Renomear no sheet
         categoria: categoria,
-        status: `${statusTipo} ${statusNumero}`
+        status: statusTipo // EXPRESS ou COLMEIA
     };
 
     ultimosRegistrosTimestamps[codigo] = agora;
@@ -486,6 +589,15 @@ async function enviarParaWebhook(payload) {
 
 function limparCampos() {
     document.getElementById("codigo").value = "";
+    document.getElementById("quantidade").value = "1"; // Reseta a quantidade
+    
+    // Não limpa categoria ou statusTipo para manter o fluxo rápido do usuário,
+    // Mas limpa o valor da caixa e cor para obrigar ele a conferir.
+    document.getElementById("caixaExpress").value = "";
+    document.getElementById("corSelecionada").value = "";
+    document.getElementById("textoCorSelecionada").innerText = "Selecione uma cor";
+    document.querySelectorAll('.cor-circle').forEach(c => c.classList.remove('selected'));
+    
     document.getElementById("codigo").focus();
 }
 
@@ -503,7 +615,8 @@ function adicionarHistorico(payload, isOffline = false){
 
 function renderizarLinhaHistorico(payload) {
     const li = document.createElement("li");
-    li.innerHTML = `${payload.hora} | ${payload.mesa} | ${payload.codigoCompleto} | ${payload.status}`;
+    // Mostra Quantidade (Qtd) e Classificação no histórico visual
+    li.innerHTML = `${payload.hora} | ${payload.codigoCompleto} | Qtd: ${payload.pedido} | ${payload.status} (${payload.variacao})`;
     document.getElementById("historico").prepend(li);
 }
 
