@@ -940,7 +940,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
             
 
-            // Pega o valor e atualiza na tela
+            // Pega o valor e updates na tela
 
             const cor = this.getAttribute('data-cor');
 
@@ -1068,7 +1068,7 @@ async function registrar(){
 
     const quantidade = document.getElementById("quantidade").value;
 
-    const categoria = document.getElementById("categoria").value;
+    const category = document.getElementById("categoria").value;
 
     const statusTipo = document.getElementById("statusTipo").value; // EXPRESS ou COLMEIA
 
@@ -1110,7 +1110,7 @@ async function registrar(){
 
 
 
-    if(!categoria || !statusTipo || !classificacaoValor || !quantidade){
+    if(!category || !statusTipo || !classificacaoValor || !quantidade){
 
         mensagem.innerHTML = "Preencha todos os campos e selecione a caixa/cor";
 
@@ -1170,7 +1170,7 @@ async function registrar(){
 
         variacao: classificacaoValor, // Cor ou Caixa vai para antiga coluna H ("VARIACAO") -> Renomear no sheet
 
-        categoria: categoria,
+        categoria: category,
 
         status: statusTipo // EXPRESS ou COLMEIA
 
@@ -1218,13 +1218,43 @@ async function registrar(){
 
 async function enviarParaWebhook(payload) {
 
-    return fetch(WEBHOOK_URL, {
+    const controller = new AbortController();
 
-        method: "POST",
+    const timeoutId = setTimeout(() => controller.abort(), 12000); // Força falha/fila se o Google demorar mais de 12s
 
-        body: JSON.stringify(payload)
 
-    });
+
+    try {
+
+        const response = await fetch(WEBHOOK_URL, {
+
+            method: "POST",
+
+            body: JSON.stringify(payload),
+
+            signal: controller.signal
+
+        });
+
+        clearTimeout(timeoutId);
+
+        
+
+        if (!response.ok) {
+
+            throw new Error("Erro de resposta do servidor");
+
+        }
+
+        return response;
+
+    } catch (error) {
+
+        clearTimeout(timeoutId);
+
+        throw error;
+
+    }
 
 }
 
