@@ -1,430 +1,1369 @@
 <!DOCTYPE html>
+
 <html lang="pt-BR">
+
 <head>
+
 <meta charset="UTF-8">
+
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+
+
 <title>Registro de Sobras</title>
 
+
+
 <style>
-/* Estilos mantidos originais */
-*{ margin:0; padding:0; box-sizing:border-box; font-family:Arial, sans-serif; }
-body{ background:#e5e7eb; display:flex; justify-content:center; align-items:center; min-height:100vh; padding:20px; color:#1f2937; }
-.container{ width:100%; max-width:540px; }
-.card{ background:#f8f8f8; border-radius:22px; padding:32px; box-shadow:0 10px 25px rgba(0,0,0,0.12); position:relative; }
-.top-badge{ position:absolute; top:18px; right:18px; background:#4f46e5; color:white; padding:10px 16px; border-radius:14px; font-size:14px; font-weight:bold; }
-h1{ text-align:center; margin-bottom:28px; font-size:22px; font-weight:800; color:#1f2937; }
-.login-box{ margin-bottom:25px; padding:18px; background:#eceff1; border:1px solid #d1d5db; border-radius:12px; }
-label{ display:block; margin-bottom:8px; font-weight:700; font-size:14px; color:#374151; }
-input, select{ width:100%; height:44px; border:1px solid #c7c7c7; border-radius:8px; padding:0 14px; font-size:15px; margin-bottom:18px; background:white; }
-input:focus, select:focus{ outline:none; border-color:#2563eb; }
-.row{ display:grid; grid-template-columns:1fr 1fr; gap:14px; }
-.row-codigo{ display:grid; grid-template-columns: 2fr 1fr; gap:14px; }
-button{ width:100%; height:50px; border:none; border-radius:10px; background:#1877f2; color:white; font-size:20px; font-weight:800; cursor:pointer; transition:0.2s; margin-top:10px; }
-button:hover{ background:#1664cf; }
-button:disabled { background: #9ca3af; cursor: not-allowed; }
-.status{ margin-top:18px; text-align:center; font-weight:bold; }
-.history{ margin-top:28px; background:#eceff1; border-radius:12px; padding:18px; }
-.history h3{ margin-bottom:12px; }
-.history ul{ list-style:none; max-height:200px; overflow:auto; }
-.history li{ padding:10px 0; border-bottom:1px solid #d1d5db; font-size:14px; }
-.footer{ text-align:center; margin-top:18px; font-size:13px; color:#6b7280; }
-.hidden{ display:none; }
-.userLogged{ background:#dbeafe; color:#1d4ed8; padding:10px; border-radius:10px; text-align:center; font-weight:bold; margin-bottom:20px; }
-.cores-container { background: white; padding: 15px; border-radius: 8px; border: 1px solid #c7c7c7; margin-bottom: 18px; }
-.cores-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; justify-items: center; }
-.cor-circle { width: 40px; height: 40px; border-radius: 50%; cursor: pointer; border: 2px solid #d1d5db; transition: all 0.2s ease-in-out; }
-.cor-circle:hover { transform: scale(1.1); }
-.cor-circle.selected { outline: 4px solid #2563eb; outline-offset: 3px; transform: scale(1.1); border-color: transparent; }
-.cor-label { text-align: center; font-size: 16px; font-weight: bold; color: #4f46e5; margin-top: 12px; min-height: 20px; }
+
+
+
+*{
+
+    margin:0;
+
+    padding:0;
+
+    box-sizing:border-box;
+
+    font-family:Arial, sans-serif;
+
+}
+
+
+
+body{
+
+    background:#e5e7eb;
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+    min-height:100vh;
+
+    padding:20px;
+
+    color:#1f2937;
+
+}
+
+
+
+.container{
+
+    width:100%;
+
+    max-width:540px;
+
+}
+
+
+
+.card{
+
+    background:#f8f8f8;
+
+    border-radius:22px;
+
+    padding:32px;
+
+    box-shadow:0 10px 25px rgba(0,0,0,0.12);
+
+    position:relative;
+
+}
+
+
+
+.top-badge{
+
+    position:absolute;
+
+    top:18px;
+
+    right:18px;
+
+    background:#4f46e5;
+
+    color:white;
+
+    padding:10px 16px;
+
+    border-radius:14px;
+
+    font-size:14px;
+
+    font-weight:bold;
+
+}
+
+
+
+h1{
+
+    text-align:center;
+
+    margin-bottom:28px;
+
+    font-size:22px;
+
+    font-weight:800;
+
+    color:#1f2937;
+
+}
+
+
+
+.login-box{
+
+    margin-bottom:25px;
+
+    padding:18px;
+
+    background:#eceff1;
+
+    border:1px solid #d1d5db;
+
+    border-radius:12px;
+
+}
+
+
+
+label{
+
+    display:block;
+
+    margin-bottom:8px;
+
+    font-weight:700;
+
+    font-size:14px;
+
+    color:#374151;
+
+}
+
+
+
+input, select{
+
+    width:100%;
+
+    height:44px;
+
+    border:1px solid #c7c7c7;
+
+    border-radius:8px;
+
+    padding:0 14px;
+
+    font-size:15px;
+
+    margin-bottom:18px;
+
+    background:white;
+
+}
+
+
+
+input:focus, select:focus{
+
+    outline:none;
+
+    border-color:#2563eb;
+
+}
+
+
+
+.row{
+
+    display:grid;
+
+    grid-template-columns:1fr 1fr;
+
+    gap:14px;
+
+}
+
+
+
+.row-codigo{
+
+    display:grid;
+
+    grid-template-columns: 2fr 1fr; /* O código fica maior que a quantidade */
+
+    gap:14px;
+
+}
+
+
+
+button{
+
+    width:100%;
+
+    height:50px;
+
+    border:none;
+
+    border-radius:10px;
+
+    background:#1877f2;
+
+    color:white;
+
+    font-size:20px;
+
+    font-weight:800;
+
+    cursor:pointer;
+
+    transition:0.2s;
+
+    margin-top:10px;
+
+}
+
+
+
+button:hover{
+
+    background:#1664cf;
+
+}
+
+
+
+button:disabled {
+
+    background: #9ca3af;
+
+    cursor: not-allowed;
+
+}
+
+
+
+.status{
+
+    margin-top:18px;
+
+    text-align:center;
+
+    font-weight:bold;
+
+}
+
+
+
+.history{
+
+    margin-top:28px;
+
+    background:#eceff1;
+
+    border-radius:12px;
+
+    padding:18px;
+
+}
+
+
+
+.history h3{
+
+    margin-bottom:12px;
+
+}
+
+
+
+.history ul{
+
+    list-style:none;
+
+    max-height:200px;
+
+    overflow:auto;
+
+}
+
+
+
+.history li{
+
+    padding:10px 0;
+
+    border-bottom:1px solid #d1d5db;
+
+    font-size:14px;
+
+}
+
+
+
+.footer{
+
+    text-align:center;
+
+    margin-top:18px;
+
+    font-size:13px;
+
+    color:#6b7280;
+
+}
+
+
+
+.hidden{
+
+    display:none;
+
+}
+
+
+
+.userLogged{
+
+    background:#dbeafe;
+
+    color:#1d4ed8;
+
+    padding:10px;
+
+    border-radius:10px;
+
+    text-align:center;
+
+    font-weight:bold;
+
+    margin-bottom:20px;
+
+}
+
+
+
+/* Estilos da Colmeia */
+
+.cores-container {
+
+    background: white;
+
+    padding: 15px;
+
+    border-radius: 8px;
+
+    border: 1px solid #c7c7c7;
+
+    margin-bottom: 18px;
+
+}
+
+
+
+.cores-grid {
+
+    display: grid;
+
+    grid-template-columns: repeat(4, 1fr);
+
+    gap: 12px;
+
+    justify-items: center;
+
+}
+
+
+
+.cor-circle {
+
+    width: 40px;
+
+    height: 40px;
+
+    border-radius: 50%;
+
+    cursor: pointer;
+
+    border: 2px solid #d1d5db;
+
+    transition: all 0.2s ease-in-out;
+
+}
+
+
+
+.cor-circle:hover {
+
+    transform: scale(1.1);
+
+}
+
+
+
+.cor-circle.selected {
+
+    outline: 4px solid #2563eb;
+
+    outline-offset: 3px;
+
+    transform: scale(1.1);
+
+    border-color: transparent;
+
+}
+
+
+
+.cor-label {
+
+    text-align: center;
+
+    font-size: 16px;
+
+    font-weight: bold;
+
+    color: #4f46e5;
+
+    margin-top: 12px;
+
+    min-height: 20px;
+
+}
+
+
+
 </style>
+
 </head>
 
+
+
 <body>
+
+
+
 <div class="container">
+
+
+
 <div class="card">
-<div class="top-badge">Registros: <span id="contador">0</span></div>
+
+
+
+<div class="top-badge">
+
+Registros: <span id="contador">0</span>
+
+</div>
+
+
+
 <h1>REGISTRO DE SOBRAS</h1>
 
+
+
 <div id="loginArea">
+
+
+
 <div class="login-box">
+
+
+
 <label>CONFERENTE</label>
+
+
+
 <select id="conferente">
+
 <option value="">SELECIONE...</option>
+
 <option>BEATRIZ.ALMEIDA</option> 
+
 <option>PHSILVA</option>
+
 <option>MGMELO</option>
+
 <option>EMILY.SANTOS</option>
+
 <option>LROSA</option>
+
 <option>MARCIO.ESTEVÃO</option>
+
 <option>NAYARA.PELEGRINI</option>
+
 <option>TFERREIRA</option> 
+
 <option>ABFONSECA</option> 
+
 <option>SAMUEL.ORTEGA</option> 
+
 <option>TFERNANDA</option> 
+
 <option>PAMELA.MARCELINO</option> 
+
 <option>DANIEL.ALVES</option> 
+
 <option>LUCAS.RAMOS</option> 
+
 <option>JARLENE.SOUZA</option> 
+
 <option>CAREN.SILVA</option> 
+
 <option>KAIQUE.GARBO</option> 
+
 <option>TSSANTOS</option> 
+
 <option>MATEUS.SOUZA</option> 
+
 <option>THAYNA.ARAUJO</option> 
+
 <option>CGAGOSTINHO</option> 
+
 <option>LGSANTOS</option>  
+
 <option>EVLIMA</option>
+
 <option>GANJOS</option>
+
 <option>GHSANTOS</option>
+
 <option>GUILHERME.SILVA</option>
+
 <option>GUSTAVO.BATISTA</option>
+
 <option>MATHEUS.HENRIQUE</option>
+
 <option>WERYK.RAMOS</option>
+
+<option></option>
+
+<option></option>
+
 </select>
+
+
 
 <label>MESA</label>
+
+
+
 <select id="mesa">
+
 <option value="">SELECIONE...</option>
+
 <option>Mesa 01</option>
+
 <option>Mesa 02</option>
+
 <option>Mesa 03</option>
+
 <option>Mesa 04</option>
+
 <option>Mesa 05</option>
+
 <option>Mesa 06</option>
+
 <option>Mesa 07</option>
+
 <option>Mesa 08</option>
+
 <option>Mesa 09 FULL</option>
+
 <option>Mesa 10 FULL</option>
+
 <option>Mesa 11 FULL</option>
+
 </select>
+
+
 
 <button onclick="fazerLogin()">ENTRAR</button>
+
+
+
 </div>
+
+
+
 </div>
+
+
 
 <div id="sistema" class="hidden">
+
+
+
 <div class="userLogged" id="usuarioLogado"></div>
 
+
+
 <div class="row">
-<div><label>DATA</label><input type="text" id="dataAtual" readonly></div>
-<div><label>HORÁRIO</label><input type="text" id="horaAtual" readonly></div>
+
+
+
+<div>
+
+<label>DATA</label>
+
+<input type="text" id="dataAtual" readonly>
+
 </div>
+
+
+
+<div>
+
+<label>HORÁRIO</label>
+
+<input type="text" id="horaAtual" readonly>
+
+</div>
+
+
+
+</div>
+
+
 
 <div class="row-codigo">
-    <div><label>COD+VARIAÇÃO</label><input type="text" id="codigo" placeholder="BIPE O PRODUTO..." autofocus></div>
-    <div><label>QUANTIDADE</label><input type="number" id="quantidade" value="1" min="1"></div>
+
+    <div>
+
+        <label>COD+VARIAÇÃO</label>
+
+        <input type="text" id="codigo" placeholder="BIPE O PRODUTO..." autofocus>
+
+    </div>
+
+    <div>
+
+        <label>QUANTIDADE</label>
+
+        <input type="number" id="quantidade" value="1" min="1">
+
+    </div>
+
 </div>
+
+
 
 <div class="row">
-<div>
-<label>CATEGORIA</label>
-<select id="categoria">
-<option value="">SELECIONE...</option>
-<option>Calçado</option>
-<option>Vestuário</option>
-<option>Acessório</option>
-<option>Suplemento</option>
-</select>
-</div>
+
+
 
 <div>
-<label>CLASSIFICAÇÃO DO PEDIDO</label>
-<select id="statusTipo">
+
+<label>CATEGORIA</label>
+
+
+
+<select id="categoria">
+
 <option value="">SELECIONE...</option>
-<option>EXPRESS</option>
-<option>COLMEIA</option>
+
+<option>Calçado</option>
+
+<option>Vestuário</option>
+
+<option>Acessório</option>
+
+<option>Suplemento</option>
+
 </select>
+
+
+
 </div>
+
+
+
+<div>
+
+<label>CLASSIFICAÇÃO DO PEDIDO</label>
+
+
+
+<select id="statusTipo">
+
+<option value="">SELECIONE...</option>
+
+<option>EXPRESS</option>
+
+<option>COLMEIA</option>
+
+</select>
+
+
+
 </div>
+
+
+
+</div>
+
+
 
 <div id="areaExpress" class="hidden">
+
     <label>NÚMERO DA CAIXA</label>
+
     <input type="text" id="caixaExpress" placeholder="BIPE A CAIXA...">
+
 </div>
+
+
 
 <div id="areaColmeia" class="hidden cores-container">
+
     <label style="text-align: center; margin-bottom: 12px;">COR DA COLMEIA</label>
+
+    
+
     <div class="cores-grid">
+
         <div class="cor-circle" style="background:#facc15;" data-cor="AMARELA"></div>
+
         <div class="cor-circle" style="background:#3b82f6;" data-cor="AZUL"></div>
+
         <div class="cor-circle" style="background:#ffffff;" data-cor="BRANCA"></div>
+
         <div class="cor-circle" style="background:#9ca3af;" data-cor="CINZA"></div>
+
         <div class="cor-circle" style="background:#f97316;" data-cor="LARANJA"></div>
+
         <div class="cor-circle" style="background:#78350f;" data-cor="MARROM"></div>
+
         <div class="cor-circle" style="background:#65a30d;" data-cor="OLIVA"></div>
+
         <div class="cor-circle" style="background:#111827;" data-cor="PRETA"></div>
+
         <div class="cor-circle" style="background:#ec4899;" data-cor="ROSA"></div>
+
         <div class="cor-circle" style="background:#a855f7;" data-cor="ROXA"></div>
+
         <div class="cor-circle" style="background:#22c55e;" data-cor="VERDE"></div>
+
         <div class="cor-circle" style="background:#ef4444;" data-cor="VERMELHA"></div>
+
     </div>
+
+    
+
     <input type="hidden" id="corSelecionada">
+
     <div class="cor-label" id="textoCorSelecionada">Selecione uma cor</div>
+
 </div>
+
+
 
 <button id="btnRegistrar" onclick="registrar()">FINALIZAR REGISTRO</button>
+
+
+
 <div class="status" id="mensagem"></div>
 
+
+
 <div class="history">
+
+
+
 <h3>ÚLTIMOS REGISTROS</h3>
+
+
+
 <ul id="historico"></ul>
+
+
+
 </div>
+
+
 
 <button onclick="sair()" style="background:#ef4444; margin-top:20px; font-size: 16px;">SAIR (LIMPAR LOGIN)</button>
+
+
+
 </div>
+
+
+
 </div>
-<div class="footer">© 2026 Controle operacional de sobras</div>
+
+
+
+<div class="footer">
+
+© 2026 Controle operacional de sobras
+
 </div>
+
+
+
+</div>
+
+
 
 <script>
-const WEBHOOK_URL = "https://script.google.com/macros/s/AKfycbwlll2eI9q3H5hEuSZ4aP-RNxRvh53EXR0-79UI8iYdvEE8UwkQ3M8wrqZ8p7_QLxK0Aw/exec";
+
+
+
+const WEBHOOK_URL = "https://script.google.com/macros/s/AKfycbz4dk_avPRWpSmTqbofvspOLCKI9ksa-zwId55ohxkzzDXlzkYZHx2EmYOKLwIqHtnAjQ/exec";
+
+
 
 let usuarioAtual = "";
+
 let mesaAtual = "";
+
 let contador = 0;
+
 let processando = false;
+
+
 
 const ultimosRegistrosTimestamps = {};
 
+
+
 document.addEventListener("DOMContentLoaded", function() {
+
     checkLoginStatus();
+
     carregarHistoricoLocal();
+
     verificarFilaPendente();
 
+
+
+    // Suporte a Leitor (Enter no Código)
+
     document.getElementById("codigo").addEventListener("keypress", function(e) {
+
         if (e.key === "Enter") {
-            document.getElementById("quantidade").focus();
+
+            const cat = document.getElementById("categoria").value;
+
+            const tipo = document.getElementById("statusTipo").value;
+
+            
+
+            // Se as opções já estiverem selecionadas, tenta registrar. Se não, pula para quantidade.
+
+            if(cat && tipo) {
+
+                document.getElementById("quantidade").focus();
+
+            } else {
+
+                document.getElementById("quantidade").focus();
+
+            }
+
         }
+
     });
+
+
+
+    // Dinâmica de exibir Express x Colmeia
 
     document.getElementById("statusTipo").addEventListener("change", function() {
+
         const areaExpress = document.getElementById("areaExpress");
+
         const areaColmeia = document.getElementById("areaColmeia");
+
         
+
+        // Limpa os dados ao trocar
+
         document.getElementById("caixaExpress").value = "";
+
         document.getElementById("corSelecionada").value = "";
+
         document.getElementById("textoCorSelecionada").innerText = "Selecione uma cor";
+
         document.querySelectorAll('.cor-circle').forEach(c => c.classList.remove('selected'));
 
+
+
         if(this.value === "EXPRESS") {
+
             areaExpress.classList.remove("hidden");
+
             areaColmeia.classList.add("hidden");
+
             document.getElementById("caixaExpress").focus();
+
         } else if (this.value === "COLMEIA") {
+
             areaColmeia.classList.remove("hidden");
+
             areaExpress.classList.add("hidden");
+
         } else {
+
             areaExpress.classList.add("hidden");
+
             areaColmeia.classList.add("hidden");
+
         }
+
     });
+
+
+
+    // Dinâmica das bolinhas de cores
 
     document.querySelectorAll('.cor-circle').forEach(circle => {
+
         circle.addEventListener('click', function() {
+
+            // Remove a classe de todas e adiciona na selecionada
+
             document.querySelectorAll('.cor-circle').forEach(c => c.classList.remove('selected'));
+
             this.classList.add('selected');
+
             
+
+            // Pega o valor e atualiza na tela
+
             const cor = this.getAttribute('data-cor');
+
             document.getElementById('corSelecionada').value = cor;
+
             document.getElementById('textoCorSelecionada').innerText = `COR: ${cor}`;
+
             document.getElementById('textoCorSelecionada').style.color = this.style.background === 'rgb(255, 255, 255)' ? '#000' : this.style.background;
+
         });
+
     });
+
 });
 
+
+
 function checkLoginStatus() {
+
     const savedConferente = localStorage.getItem("conferenteLogado");
+
     const savedMesa = localStorage.getItem("mesaLogada");
+
+
+
     if (savedConferente && savedMesa) {
+
         usuarioAtual = savedConferente;
+
         mesaAtual = savedMesa;
+
         iniciarSistema();
+
     }
+
 }
+
+
 
 function fazerLogin(){
+
     const conferente = document.getElementById("conferente").value;
+
     const mesa = document.getElementById("mesa").value;
-    if(!conferente || !mesa){ alert("Preencha todos os campos"); return; }
+
+
+
+    if(!conferente || !mesa){
+
+        alert("Preencha todos os campos");
+
+        return;
+
+    }
+
+
+
     usuarioAtual = conferente;
+
     mesaAtual = mesa;
+
     localStorage.setItem("conferenteLogado", usuarioAtual);
+
     localStorage.setItem("mesaLogada", mesaAtual);
+
     iniciarSistema();
+
 }
+
+
 
 function iniciarSistema() {
+
     document.getElementById("loginArea").classList.add("hidden");
+
     document.getElementById("sistema").classList.remove("hidden");
+
     document.getElementById("usuarioLogado").innerHTML = `${usuarioAtual} | ${mesaAtual}`;
+
     atualizarHorario();
+
     setInterval(atualizarHorario,1000);
+
 }
+
+
 
 function sair() {
+
     if(confirm("Deseja realmente sair?")){
+
         localStorage.removeItem("conferenteLogado");
+
         localStorage.removeItem("mesaLogada");
+
         localStorage.removeItem("historicoLocal");
+
         window.location.reload();
+
     }
+
 }
+
+
 
 function atualizarHorario(){
+
     const agora = new Date();
+
     document.getElementById("dataAtual").value = agora.toLocaleDateString("pt-BR");
+
     document.getElementById("horaAtual").value = agora.toLocaleTimeString("pt-BR");
+
 }
 
+
+
 async function registrar(){
+
     if(processando) return;
 
+
+
     const codigo = document.getElementById("codigo").value.trim();
+
     const quantidade = document.getElementById("quantidade").value;
+
     const categoria = document.getElementById("categoria").value;
-    const statusTipo = document.getElementById("statusTipo").value;
+
+    const statusTipo = document.getElementById("statusTipo").value; // EXPRESS ou COLMEIA
+
     
+
     let classificacaoValor = "";
+
     if (statusTipo === "EXPRESS") {
+
         classificacaoValor = document.getElementById("caixaExpress").value.trim();
+
     } else if (statusTipo === "COLMEIA") {
+
         classificacaoValor = document.getElementById("corSelecionada").value;
+
     }
+
+
 
     const mensagem = document.getElementById("mensagem");
+
     const btn = document.getElementById("btnRegistrar");
 
+
+
+    // Validação do Formato Bipado
+
     const regex = /^\d{6}\+\d{3}$/;
+
     if(!regex.test(codigo)){
+
         mensagem.innerHTML = "Formato inválido. Ex: 123456+001";
+
         mensagem.style.color = "red";
+
         return;
+
     }
+
+
 
     if(!categoria || !statusTipo || !classificacaoValor || !quantidade){
+
         mensagem.innerHTML = "Preencha todos os campos e selecione a caixa/cor";
+
         mensagem.style.color = "red";
+
         return;
+
     }
+
+
 
     const agora = Date.now();
+
     if(ultimosRegistrosTimestamps[codigo] && agora - ultimosRegistrosTimestamps[codigo] < 300000){
+
         if(!confirm("Este item foi registrado há menos de 5 min. Duplicar registro?")) return;
+
     }
 
+
+
     processando = true;
+
     btn.disabled = true;
+
     btn.innerText = "ENVIANDO...";
+
     mensagem.innerHTML = "Processando...";
+
     mensagem.style.color = "gray";
 
+
+
+    /* Mapeamento Ajustado:
+
+       O Timestamp foi removido.
+
+       O antigo 'pedido' agora manda a Quantidade (Coluna F).
+
+       A antiga 'variacao' agora manda a Cor ou Caixa (Coluna G).
+
+    */
+
     const payload = {
+
         data: new Date().toLocaleDateString("pt-BR"),
+
         hora: new Date().toLocaleTimeString("pt-BR"),
+
         conferente: usuarioAtual,
+
         mesa: mesaAtual,
+
         codigoCompleto: codigo,
-        pedido: quantidade, 
-        variacao: classificacaoValor,
+
+        pedido: quantidade,  // Quantidade vai para a antiga coluna G ("PEDIDO") -> Renomear no sheet
+
+        variacao: classificacaoValor, // Cor ou Caixa vai para antiga coluna H ("VARIACAO") -> Renomear no sheet
+
         categoria: categoria,
-        status: statusTipo
+
+        status: statusTipo // EXPRESS ou COLMEIA
+
     };
+
+
 
     ultimosRegistrosTimestamps[codigo] = agora;
 
+
+
     try {
+
         await enviarParaWebhook(payload);
+
         mensagem.innerHTML = "Registro enviado com sucesso";
+
         mensagem.style.color = "green";
+
     } catch (error) {
+
         salvarNaFila(payload);
-        mensagem.innerHTML = "Sem conexão ou Timeout. Salvo para envio automático!";
+
+        mensagem.innerHTML = "Sem conexão. Salvo para envio automático!";
+
         mensagem.style.color = "#d97706";
+
     }
+
+
 
     adicionarHistorico(payload);
+
     limparCampos();
+
     processando = false;
+
     btn.disabled = false;
+
     btn.innerText = "FINALIZAR REGISTRO";
+
 }
+
+
 
 async function enviarParaWebhook(payload) {
-    // CORREÇÃO: Enviando com content-type text/plain para evitar bloqueio de CORS do Google Apps Script
-    const response = await fetch(WEBHOOK_URL, {
+
+    return fetch(WEBHOOK_URL, {
+
         method: "POST",
-        headers: {
-            "Content-Type": "text/plain;charset=utf-8"
-        },
+
         body: JSON.stringify(payload)
+
     });
-    
-    if (!response.ok) {
-        throw new Error("Erro na comunicação com a planilha");
-    }
-    return response;
+
 }
+
+
 
 function limparCampos() {
+
     document.getElementById("codigo").value = "";
-    document.getElementById("quantidade").value = "1";
+
+    document.getElementById("quantidade").value = "1"; // Reseta a quantidade
+
+    
+
+    // Não limpa categoria ou statusTipo para manter o fluxo rápido do usuário,
+
+    // Mas limpa o valor da caixa e cor para obrigar ele a conferir.
+
     document.getElementById("caixaExpress").value = "";
+
     document.getElementById("corSelecionada").value = "";
+
     document.getElementById("textoCorSelecionada").innerText = "Selecione uma cor";
+
     document.querySelectorAll('.cor-circle').forEach(c => c.classList.remove('selected'));
+
+    
+
     document.getElementById("codigo").focus();
+
 }
 
-function adicionarHistorico(payload){
+
+
+function adicionarHistorico(payload, isOffline = false){
+
     contador++;
+
     document.getElementById("contador").innerHTML = contador;
+
+
+
     const hist = JSON.parse(localStorage.getItem("historicoLocal") || "[]");
+
     hist.unshift(payload);
+
     if(hist.length > 20) hist.pop();
+
     localStorage.setItem("historicoLocal", JSON.stringify(hist));
+
+
+
     renderizarLinhaHistorico(payload);
+
 }
+
+
 
 function renderizarLinhaHistorico(payload) {
+
     const li = document.createElement("li");
+
+    // Mostra Quantidade (Qtd) e Classificação no histórico visual
+
     li.innerHTML = `${payload.hora} | ${payload.codigoCompleto} | Qtd: ${payload.pedido} | ${payload.status} (${payload.variacao})`;
+
     document.getElementById("historico").prepend(li);
+
 }
 
-function salvarNaFila(payload) {
-    const fila = JSON.parse(localStorage.getItem("filaPendente") || "[]");
-    fila.push(payload);
-    localStorage.setItem("filaPendente", JSON.stringify(fila));
-}
+
 
 function carregarHistoricoLocal() {
+
     const hist = JSON.parse(localStorage.getItem("historicoLocal") || "[]");
+
     hist.reverse().forEach(item => {
+
         renderizarLinhaHistorico(item);
+
         contador++;
+
     });
+
     document.getElementById("contador").innerHTML = contador;
+
 }
 
-// CORREÇÃO: A lógica da fila pendente foi arrumada para só remover do cache se realmente tiver sucesso no envio.
-async function verificarFilaPendente() {
-    setInterval(async () => {
-        if(navigator.onLine) {
-            const fila = JSON.parse(localStorage.getItem("filaPendente") || "[]");
-            if(fila.length > 0) {
-                const item = fila[0];
-                try {
-                    await enviarParaWebhook(item);
-                    // Só remove se der sucesso
-                    fila.shift();
-                    localStorage.setItem("filaPendente", JSON.stringify(fila));
-                    console.log("Item pendente enviado da fila com sucesso!");
-                } catch(e) {
-                    console.error("Tentativa de envio da fila falhou. Tentará de novo no próximo ciclo.", e);
-                }
-            }
-        }
-    }, 10000);
+
+
+function salvarNaFila(payload) {
+
+    const fila = JSON.parse(localStorage.getItem("filaPendente") || "[]");
+
+    fila.push(payload);
+
+    localStorage.setItem("filaPendente", JSON.stringify(fila));
+
 }
+
+
+
+async function verificarFilaPendente() {
+
+    setInterval(async () => {
+
+        if(navigator.onLine) {
+
+            const fila = JSON.parse(localStorage.getItem("filaPendente") || "[]");
+
+            if(fila.length > 0) {
+
+                const item = fila[0];
+
+                try {
+
+                    await enviarParaWebhook(item);
+
+                    fila.shift();
+
+                    localStorage.setItem("filaPendente", JSON.stringify(fila));
+
+                    console.log("Item pendente enviado!");
+
+                } catch(e) {}
+
+            }
+
+        }
+
+    }, 10000);
+
+}
+
+
+
 </script>
+
+
+
 </body>
+
 </html>
